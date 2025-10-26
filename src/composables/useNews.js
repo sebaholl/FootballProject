@@ -22,7 +22,7 @@ export function useNews() {
   const create = (payload) => {
     const clean = {
       title: (payload.title || '').trim().slice(0, 120),
-      body: (payload.body || '').trim().slice(0, 10000),
+      body: (payload.body || '').trim().slice(0, 10000), // also here
       imageUrl: payload.imageUrl ? payload.imageUrl.trim() : null,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
@@ -34,7 +34,7 @@ export function useNews() {
   const update = (id, payload) => {
     const clean = {
       title: (payload.title || '').trim().slice(0, 120),
-      body: (payload.body || '').trim().slice(0, 10000),
+      body: (payload.body || '').trim().slice(0, 10000), // reduce too store less data, so firebase wont hit limits
       imageUrl: payload.imageUrl ? payload.imageUrl.trim() : null,
       updatedAt: serverTimestamp(),
       ...(payload.publishedAt ? { publishedAt: payload.publishedAt } : {})

@@ -1,35 +1,50 @@
 // src/composables/useApi.js
 import axios from 'axios'
 
-const BASE = import.meta.env.VITE_SPORTMONKS_BASE; // /sm/v3
-const TOKEN = import.meta.env.VITE_SPORTMONKS_TOKEN;
+const BASE = import.meta.env.VITE_SPORTMONKS_BASE // např. /sm/v3
+const TOKEN = import.meta.env.VITE_SPORTMONKS_TOKEN
 
 export function useApi() {
   const http = axios.create({
     baseURL: BASE.endsWith('/') ? BASE : BASE + '/',
     params: { api_token: TOKEN },
-  });
+  })
 
+  // 🔹 Universal GET helper
   const get = (path, params = {}) => {
-    const url = path.startsWith('/') ? path.slice(1) : path;
-    console.log('[SM] CALL ->', (BASE.endsWith('/') ? BASE : BASE + '/') + url, params);
-    return http.get(url, { params }).then((res) => res.data);
-  };
+    const url = path.startsWith('/') ? path.slice(1) : path
+    console.log('[SM] CALL ->', (BASE.endsWith('/') ? BASE : BASE + '/') + url, params)
+    return http.get(url, { params }).then((res) => res.data)
+  }
 
-  // standings & teams — beze změny
+  // ============================
+  // 🟩 STANDINGS
+  // ============================
   const getStandingsBySeason = (seasonId, params = {}) =>
-    get(`football/standings/seasons/${seasonId}`, params);
+    get(`football/standings/seasons/${seasonId}`, params)
 
+  // ============================
+  // 🟩 TEAMS
+  // ============================
   const getTeamsBySeason = (seasonId, params = {}) =>
-    get(`football/teams/seasons/${seasonId}`, params);
+    get(`football/teams/seasons/${seasonId}`, params)
 
-  // ✅ Team schedule – bez include, protože API ho nepodporuje
-const getTeamSchedule = async (teamId, seasonId, params = {}) => {
+  // ============================
+  // 🟩 FIXTURES (plně funkční)
+  // ============================
+  // ⚡ Tahá zápasy všech týmů pro danou sezónu – používá funkční endpoint
+  // ✅ Team schedule – sezonní endpoint, bez include (API ho stejně ignoruje)
+const getTeamSchedule = async (teamId, seasonId) => {
+  // preferuj sezonní tvar, když máme seasonId
+  if (seasonId) {
+    return await get(`football/schedules/seasons/${seasonId}/teams/${teamId}`);
+  }
+  // fallback bez seasonId
   return await get(`football/schedules/teams/${teamId}`);
 };
 
 
-  // (zůstává, pokud ho někdy aktivují) – použijeme jen když endpoint existuje
+  // (volitelně zachováno pro budoucnost — zatím SportMonks v3 fixtures endpoint nevrací nic)
   const getFixturesBySeason = async (seasonId, params = {}) => {
     return get('football/fixtures', {
       seasons: seasonId,
@@ -38,18 +53,25 @@ const getTeamSchedule = async (teamId, seasonId, params = {}) => {
         'participants;team;league;round;state;scores',
       page: params.page ?? 1,
       per_page: params.per_page ?? 200,
-    });
-  };
+    })
+  }
 
+  // ============================
+  // 🟩 SQUAD (hráči týmu)
+  // ============================
   const getSquadByTeamSeason = (teamId, seasonId, params = {}) =>
-    get(`football/squads/teams/${teamId}/seasons/${seasonId}`, params);
+    get(`football/squads/teams/${teamId}/seasons/${seasonId}`, params)
 
+  // ============================
+  // 🟩 Export API
+  // ============================
   return {
     get,
     getStandingsBySeason,
     getTeamsBySeason,
-    getFixturesBySeason, // necháme tu – třeba ho časem budeš moct použít
-    getTeamSchedule,     // ⬅️ budeme používat teď
+    getTeamSchedule, // ✅ aktuální endpoint pro zápasy
+    getFixturesBySeason, // (ponechán jako fallback)
     getSquadByTeamSeason,
-  };
+  }
 }
+

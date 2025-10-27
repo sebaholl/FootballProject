@@ -157,65 +157,130 @@ async function syncTeams() {
   }
 }
 
-// =============== FIXTURES (získáme pro každý tým ze seznamu týmů) ===============
+// =============== FIXTURES (ze schedules endpointu: rounds[].fixtures[]) ===============
 async function syncFixtures() {
-  if (!seasonId) { msg.value = '❌ Chybí VITE_SEASON_ID v .env'; return }
+  if (!seasonId) {
+    msg.value = '❌ Chybí VITE_SEASON_ID v .env'
+    return
+  }
+
   loading.value = true
   msg.value = ''
 
-  try {
-    let allFixtures = []
-
-    // vezmeme všechny týmy z Firestore (abychom věděli, pro koho tahat)
-    const teamsSnap = await getDocs(collection(db, 'sync', 'teams', 'list'))
-    const teams = teamsSnap.docs.map(d => ({ id: d.id, ...d.data() }))
-
-    for (const team of teams) {
-      console.log(`📡 Tahám zápasy pro tým ${team.name} (${team.id})`)
-      const res = await getTeamSchedule(team.id, seasonId)
-      const data = res?.data || res // SportMonks může vracet buď {data:[]} nebo []
-
-      // 💡 Tady je klíčová část – rozbalíme fixtures z každého schedule
-      const fixtures = []
-      data.forEach(sch => {
-        if (Array.isArray(sch.fixtures)) {
-          fixtures.push(...sch.fixtures)
-        }
+  // ⬇️ správná extrakce: stage.rounds[].fixtures[]
+  const extractFixturesFromSchedule = (res) => {
+    const out = []
+    const stages = Array.isArray(res?.data) ? res.data : (res?.data ? [res.data] : [])
+    stages.forEach(st => {
+      const rounds = Array.isArray(st?.rounds) ? st.rounds : (st?.rounds?.data || [])
+      rounds.forEach(r => {
+        const fx = Array.isArray(r?.fixtures) ? r.fixtures : (r?.fixtures?.data || [])
+        fx.forEach(f => out.push({ ...f, __round_name: r?.name }))
       })
+    })
+    return out
+  }
 
-      if (fixtures.length) {
-        allFixtures.push(...fixtures)
-      }
-    }
+  try {
+    const baseCol = collection(db, 'sync', 'fixtures', 'list')
 
-    if (!allFixtures.length) {
-      msg.value = '⚠️ API nevrátilo žádné fixtures'
-      console.log('[Fixtures debug]', allFixtures)
+    // 1) načteme už nasyncované týmy
+    const teamsSnap = await getDocs(collection(db, 'sync', 'teams', 'list'))
+    if (teamsSnap.empty) {
+      msg.value = '⚠️ Žádné týmy v DB — spusť nejdřív Sync TEAMS'
+      loading.value = false
       return
     }
 
-    // odstraníme duplikáty podle ID
-    const uniqueFixtures = Object.values(Object.fromEntries(allFixtures.map(f => [f.id, f])))
+    const teams = teamsSnap.docs.map(d => ({ id: Number(d.id), ...d.data() }))
+    const roundsFilter = new Set((Array.isArray(SYNC_ROUNDS) ? SYNC_ROUNDS : []).map(Number).filter(Boolean))
+    const leagueId = Number(import.meta.env.VITE_LEAGUE_ID || 0)
 
-    const batch = writeBatch(db)
-    const baseCol = collection(db, 'sync', 'fixtures', 'list')
+    const all = []
 
-    uniqueFixtures.forEach(f => {
+    // 2) projdeme týmy a vytáhneme jejich rozpis
+    for (const t of teams) {
+      console.log(`📡 Tahám zápasy pro tým ${t.name || ''} (${t.id})`)
+      let res
+      try {
+        // schedules (season-scoped) – endpoint je bez include
+        res = await getTeamSchedule(t.id, seasonId)
+      } catch (e) {
+        console.warn(`⚠️ Schedule selhal pro tým ${t.id}`, e?.response?.data || e?.message || e)
+        continue
+      }
+
+      const fixtures = extractFixturesFromSchedule(res)
+
+      fixtures.forEach(f => {
+        // filtruj na správnou ligu/sezónu (pokud jsou na položce k dispozici)
+        if (leagueId && f.league_id && Number(f.league_id) !== leagueId) return
+        if (seasonId && f.season_id && Number(f.season_id) !== seasonId) return
+
+        // filtr kol (1–7 apod.) — pokud je definován
+        if (roundsFilter.size) {
+          const rNum = Number(f.__round_name)
+          if (!roundsFilter.has(rNum)) return
+        }
+
+        all.push(f)
+      })
+    }
+
+    // 3) deduplikace podle fixture.id
+    const byId = new Map()
+    all.forEach(f => { if (f?.id && !byId.has(f.id)) byId.set(f.id, f) })
+    const unique = [...byId.values()]
+    console.log(`🧮 Celkem unikátních zápasů: ${unique.length}`)
+
+    // 4) zápis do Firestore
+    let written = 0
+    let batch = writeBatch(db)
+
+    const commitIfNeeded = async () => {
+      if (written > 0 && written % 450 === 0) {
+        await batch.commit()
+        batch = writeBatch(db)
+      }
+    }
+
+    for (const f of unique) {
+      const parts = Array.isArray(f?.participants) ? f.participants : (f?.participants?.data || [])
+      let home = null, away = null
+      for (const p of parts) {
+        const loc = p?.meta?.location || p?.meta?.data?.location
+        if (loc === 'home') home = p
+        if (loc === 'away') away = p
+      }
+
+      const start = f?.starting_at || f?.start_at || null
+
       batch.set(doc(baseCol, String(f.id)), {
         id: f.id,
-        name: f?.name ?? null,
-        date: f?.starting_at ? Timestamp.fromDate(new Date(f.starting_at)) : null,
-        venue_id: f?.venue_id ?? null,
-        round_id: f?.round_id ?? null,
         league_id: f?.league_id ?? null,
-        status: f?.state_id ?? null,
+        season_id: f?.season_id ?? null,
+        round_id: f?.round_id ?? null,
+        round: f?.__round_name ?? null,
+        name: f?.name ?? null,
+        date: start ? Timestamp.fromDate(new Date(start)) : null,
+        home_id: home?.id ?? null,
+        home_name: home?.name ?? null,
+        away_id: away?.id ?? null,
+        away_name: away?.name ?? null,
+        status: (f?.state?.name || f?.state || 'scheduled')?.toString().toLowerCase(),
+        scores: f?.scores ?? null,
         updatedAt: serverTimestamp(),
       }, { merge: true })
-    })
+
+      written++
+      await commitIfNeeded()
+    }
 
     await batch.commit()
     await writeLastSync('fixtures')
-    msg.value = `✅ Fixtures hotovo: ${uniqueFixtures.length} zápasů (nalezeno ${allFixtures.length}, deduplikováno podle id)`
+
+    msg.value = `✅ Fixtures hotovo: ${written} zápasů (nalezeno ${all.length}, deduplikováno podle id)`
+    console.log(`✅ Fixtures sync done: ${written} zápasů`)
   } catch (e) {
     console.error('[Sync fixtures error]', e)
     msg.value = e?.message || '❌ Chyba synchronizace fixtures'
@@ -223,6 +288,10 @@ async function syncFixtures() {
     loading.value = false
   }
 }
+
+
+
+
 
 
 </script>
@@ -241,6 +310,8 @@ async function syncFixtures() {
       <button :disabled="loading" @click="syncStandings">Sync STANDINGS → Firestore</button>
       <button :disabled="loading" @click="syncTeams">Sync TEAMS → Firestore</button>
       <button :disabled="loading" @click="syncFixtures">Sync FIXTURES (1–7) → Firestore</button>
+
+
     </div>
 
     <p>{{ msg }}</p>

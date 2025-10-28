@@ -115,7 +115,7 @@ const filtered = computed(() => {
 </script>
 
 <template>
-  <section class="wrap">
+  <section class="wrap" style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
     <header class="head">
       <h2>Fixtures</h2>
 
@@ -177,7 +177,7 @@ const filtered = computed(() => {
 
 <style scoped>
 /* základ */
-.wrap { padding:24px; color:#1ad02f; } /* temná čitelná */
+.wrap { padding:24px; color:#ff0030; } /* temná čitelná */
 .head { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
 h2 { margin:0; font-weight:800; }
 

@@ -28,8 +28,8 @@ function openTeam(id) {
 </script>
 
 <template>
-  <section style="padding:24px">
-    <h2>Týmy</h2>
+  <section style="padding:24px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h2>Teams</h2>
     <p v-if="loading">Načítám…</p>
     <p v-else-if="err" style="color:#c00">{{ err }}</p>
 

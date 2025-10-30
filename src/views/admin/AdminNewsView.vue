@@ -99,13 +99,26 @@ onMounted(load)
       </div>
 
       <div>
-        <label>Image URL (optional)</label>
-        <input v-model="form.imageUrl" placeholder="https://..." />
-        <small v-if="form.imageUrl && !isValidUrl(form.value.imageUrl)" style="color:#c00">Invalid URL</small>
-        <div v-if="form.imageUrl && isValidUrl(form.value.imageUrl)" style="margin-top:8px">
-          <img :src="form.imageUrl" alt="Preview" style="max-width:240px; border-radius:8px; border:1px solid #eee" />
+          <label>Image URL (optional)</label>
+          <input v-model="form.imageUrl" placeholder="https://..." />
+            <small
+            v-if="form.imageUrl && !isValidUrl(form.imageUrl)"
+            style="color:#c00"
+            >
+            Invalid URL
+            </small>
+            <div
+              v-if="form.imageUrl && isValidUrl(form.imageUrl)"
+              style="margin-top:8px"
+              >
+              <img
+              :src="form.imageUrl"
+              alt="Preview"
+              style="max-width:240px; border-radius:8px; border:1px solid #eee"
+              />
+            </div>
         </div>
-      </div>
+
 
       <div>
         <label>Publish date (optional)</label>

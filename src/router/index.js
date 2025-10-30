@@ -40,6 +40,12 @@ const routes = [
     component: () => import('../views/NewsListView.vue'),
   },
   {
+  path: '/teams/:id',
+  name: 'team',
+  component: () => import('@/views/TeamView.vue'),
+  props: true,
+  },
+  {
     path: '/news/:id',
     name: 'newsDetail',
     component: () => import('../views/NewsDetailView.vue'),

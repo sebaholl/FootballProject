@@ -18,6 +18,13 @@ a,
   transition: 0.4s;
   padding: 3px;
 }
+body {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400; /* default */
+  font-style: normal;
+}
+
 
 @media (hover: hover) {
   a:hover {
@@ -37,3 +44,6 @@ a,
     padding: 0 2rem;
   }
 }
+
+
+

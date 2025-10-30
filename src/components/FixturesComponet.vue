@@ -39,10 +39,6 @@ function scoresArray(fix) {
   return Array.isArray(fix?.scores) ? fix.scores : (fix?.scores?.data ?? [])
 }
 
-/* ---- FINÁLNÍ SKÓRE (robustní) ----
-   1) pokud je scores objekt {ft_home, ft_away} apod., použijeme ho
-   2) pokud je scores pole, projdeme je a vezmeme poslední známou hodnotu
-*/
 function finalGoals(fix) {
   // objektové skóre
   if (fix?.scores && !Array.isArray(fix.scores)) {
@@ -106,7 +102,7 @@ async function load() {
     }
     teamMap.value = map
   } catch (e) {
-    console.error(e); err.value = e?.message || 'Chyba načítání zápasů'
+    console.error(e); err.value = e?.message || 'Failed to load fixtures data'
   } finally {
     loading.value = false
   }
@@ -217,7 +213,7 @@ function collapse() {
             <button class="more-btn ghost" @click="collapse">Show less</button>
             </div>
 
-    <p v-if="!loading && !err && !filtered.length" class="muted">Nic k zobrazení – změň filtr kola nebo spusť sync.</p>
+    <p v-if="!loading && !err && !filtered.length" class="muted">No fixtures found – change the round filter or run sync.</p>
 
   </section>
 

@@ -30,7 +30,7 @@ function openTeam(id) {
 <template>
   <section style="padding:24px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
     <h2>Teams</h2>
-    <p v-if="loading">Načítám…</p>
+    <p v-if="loading">Loading…</p>
     <p v-else-if="err" style="color:#c00">{{ err }}</p>
 
     <div v-else style="display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:16px">
@@ -45,6 +45,6 @@ function openTeam(id) {
       </button>
     </div>
 
-    <p v-if="!loading && !err && teams.length === 0" style="margin-top:12px">Žádná data – spusť Sync Teams v adminu.</p>
+    <p v-if="!loading && !err && teams.length === 0" style="margin-top:12px">No data – run Sync Teams in admin.</p>
   </section>
 </template>

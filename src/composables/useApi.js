@@ -17,23 +17,14 @@ export function useApi() {
     return http.get(url, { params }).then((res) => res.data)
   }
 
-  // ============================
-  // 🟩 STANDINGS
-  // ============================
   const getStandingsBySeason = (seasonId, params = {}) =>
     get(`football/standings/seasons/${seasonId}`, params)
 
-  // ============================
-  // 🟩 TEAMS
-  // ============================
+
   const getTeamsBySeason = (seasonId, params = {}) =>
     get(`football/teams/seasons/${seasonId}`, params)
 
-  // ============================
-  // 🟩 FIXTURES (plně funkční)
-  // ============================
-  // ⚡ Tahá zápasy všech týmů pro danou sezónu – používá funkční endpoint
-  // ✅ Team schedule – sezonní endpoint, bez include (API ho stejně ignoruje)
+
 const getTeamSchedule = async (teamId, seasonId) => {
   // preferuj sezonní tvar, když máme seasonId
   if (seasonId) {
@@ -56,15 +47,10 @@ const getTeamSchedule = async (teamId, seasonId) => {
     })
   }
 
-  // ============================
-  // 🟩 SQUAD (hráči týmu)
-  // ============================
+
   const getSquadByTeamSeason = (teamId, seasonId, params = {}) =>
     get(`football/squads/teams/${teamId}/seasons/${seasonId}`, params)
 
-  // ============================
-  // 🟩 Export API
-  // ============================
   return {
     get,
     getStandingsBySeason,

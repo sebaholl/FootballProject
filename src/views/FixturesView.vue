@@ -97,7 +97,7 @@ async function load() {
     }
     teamMap.value = map
   } catch (e) {
-    console.error(e); err.value = e?.message || 'Chyba načítání zápasů'
+    console.error(e); err.value = e?.message || 'Loading error'
   } finally {
     loading.value = false
   }
@@ -120,7 +120,7 @@ const filtered = computed(() => {
       <h2>Fixtures</h2>
 
       <!-- hezčí pill-picker pro 1–7 -->
-      <div class="round-picker" role="group" aria-label="Výběr kola">
+      <div class="round-picker" role="group" aria-label="Filter by round">
         <button class="pill" :class="{active: selectedRound === ''}" @click="selectedRound=''">All</button>
         <button v-for="n in 7" :key="n" class="pill" :class="{active: selectedRound === String(n)}" @click="selectedRound = String(n)">
           {{ n }}
@@ -128,7 +128,7 @@ const filtered = computed(() => {
       </div>
     </header>
 
-    <div v-if="loading" class="muted">Načítám…</div>
+    <div v-if="loading" class="muted">Loading…</div>
     <div v-else-if="err" class="err">{{ err }}</div>
 
     <transition-group name="fade" tag="ul" class="list" v-else>
@@ -171,7 +171,7 @@ const filtered = computed(() => {
       </li>
     </transition-group>
 
-    <p v-if="!loading && !err && !filtered.length" class="muted">Nic k zobrazení – změň filtr kola nebo spusť sync.</p>
+    <p v-if="!loading && !err && !filtered.length" class="muted">No matches to display – change the round filter or run sync.</p>
   </section>
 </template>
 

@@ -27,12 +27,12 @@ const submit = async () => {
 </script>
 
 <template>
-  <section style="max-width:420px;margin:40px auto;padding:24px;border:1px solid #eee;border-radius:12px">
-    <h2>Přihlášení</h2>
+  <section style="max-width:420px;margin:40px auto;padding:24px;border:1px solid #eee;border-radius:12px; margin-bottom: 200px;">
+    <h2>Login</h2>
     <form @submit.prevent="submit" style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
       <input v-model="email" type="email" placeholder="Email" required />
-      <input v-model="password" type="password" placeholder="Heslo" required />
-      <button :disabled="loading" type="submit">Přihlásit</button>
+      <input v-model="password" type="password" placeholder="Password" required />
+      <button :disabled="loading" type="submit">Login</button>
       <p v-if="err" style="color:#c00">{{ err }}</p>
     </form>
   </section>

@@ -36,7 +36,7 @@ async function writeLastSync(area) {
 
 // =============== STANDINGS (v3 + details.type) ===============
 async function syncStandings() {
-  if (!seasonId) { msg.value = '❌ Chybí VITE_SEASON_ID v .env'; return }
+  if (!seasonId) { msg.value = 'Missing VITE_SEASON_ID in .env'; return }
   loading.value = true
   msg.value = ''
   try {
@@ -51,7 +51,7 @@ async function syncStandings() {
       []
 
     if (!Array.isArray(raw) || raw.length === 0) {
-      msg.value = '⚠️ API nevrátilo žádná standings data'
+      msg.value = '❌ No standings data found from API'
       return
     }
 
@@ -103,10 +103,10 @@ async function syncStandings() {
 
     await batch.commit()
     await writeLastSync('standings')
-    msg.value = `✅ Standings hotovo: ${written} řádků (včetně statistik)`
+    msg.value = `✅ Standings done: ${written}`
   } catch (e) {
     console.error('[Sync standings error]', e)
-    msg.value = e?.message || '❌ Chyba synchronizace standings'
+    msg.value = e?.message || '❌ Error syncing standings'
   } finally {
     loading.value = false
   }
@@ -114,7 +114,7 @@ async function syncStandings() {
 
 // =============== TEAMS (jen pro danou sezónu, pagination) ===============
 async function syncTeams() {
-  if (!seasonId) { msg.value = '❌ Chybí VITE_SEASON_ID v .env'; return }
+  if (!seasonId) { msg.value = '❌ Missing VITE_SEASON_ID in .env'; return }
   loading.value = true
   msg.value = ''
   try {
@@ -148,10 +148,10 @@ async function syncTeams() {
     }
 
     await writeLastSync('teams')
-    msg.value = `✅ Teams hotovo: ${total} týmů`
+    msg.value = `✅ Teams done: ${total}`
   } catch (e) {
     console.error('[Sync teams error]', e)
-    msg.value = e?.message || '❌ Chyba synchronizace teams'
+    msg.value = e?.message || '❌ Error syncing teams'
   } finally {
     loading.value = false
   }
@@ -160,7 +160,7 @@ async function syncTeams() {
 // =============== FIXTURES (ze schedules endpointu: rounds[].fixtures[]) ===============
 async function syncFixtures() {
   if (!seasonId) {
-    msg.value = '❌ Chybí VITE_SEASON_ID v .env'
+    msg.value = '❌ Missing VITE_SEASON_ID in .env'
     return
   }
 
@@ -187,7 +187,7 @@ async function syncFixtures() {
     // 1) načteme už nasyncované týmy
     const teamsSnap = await getDocs(collection(db, 'sync', 'teams', 'list'))
     if (teamsSnap.empty) {
-      msg.value = '⚠️ Žádné týmy v DB — spusť nejdřív Sync TEAMS'
+      msg.value = '⚠️ No teams found in DB — please run Sync TEAMS first'
       loading.value = false
       return
     }
@@ -200,13 +200,13 @@ async function syncFixtures() {
 
     // 2) projdeme týmy a vytáhneme jejich rozpis
     for (const t of teams) {
-      console.log(`📡 Tahám zápasy pro tým ${t.name || ''} (${t.id})`)
+      console.log(`📡 Getting fixtures for team ${t.name || ''} (${t.id})`)
       let res
       try {
         // schedules (season-scoped) – endpoint je bez include
         res = await getTeamSchedule(t.id, seasonId)
       } catch (e) {
-        console.warn(`⚠️ Schedule selhal pro tým ${t.id}`, e?.response?.data || e?.message || e)
+        console.warn(`⚠️ Schedule failed for team ${t.id}`, e?.response?.data || e?.message || e)
         continue
       }
 
@@ -231,7 +231,7 @@ async function syncFixtures() {
     const byId = new Map()
     all.forEach(f => { if (f?.id && !byId.has(f.id)) byId.set(f.id, f) })
     const unique = [...byId.values()]
-    console.log(`🧮 Celkem unikátních zápasů: ${unique.length}`)
+    console.log(`Overall: ${unique.length}`)
 
     // 4) zápis do Firestore
     let written = 0
@@ -279,11 +279,11 @@ async function syncFixtures() {
     await batch.commit()
     await writeLastSync('fixtures')
 
-    msg.value = `✅ Fixtures hotovo: ${written} zápasů (nalezeno ${all.length}, deduplikováno podle id)`
-    console.log(`✅ Fixtures sync done: ${written} zápasů`)
+    msg.value = `✅ Fixtures done: ${written} matches (found ${all.length}, deduplicated by id)`
+    console.log(`✅ Fixtures sync done: ${written} matches`)
   } catch (e) {
     console.error('[Sync fixtures error]', e)
-    msg.value = e?.message || '❌ Chyba synchronizace fixtures'
+    msg.value = e?.message || '❌ Error syncing fixtures'
   } finally {
     loading.value = false
   }
@@ -300,9 +300,9 @@ async function syncFixtures() {
   <div style="padding:16px;">
     <h2>Admin → Sync</h2>
     <p>
-      Sezóna: {{ seasonId }}
-      · Liga: {{ LEAGUE_ID }}
-      · Kola: {{ SYNC_ROUNDS.join(', ') }}
+      Season: {{ seasonId }}
+      · League: {{ LEAGUE_ID }}
+      · Rounds: {{ SYNC_ROUNDS.join(', ') }}
       · PER_PAGE: {{ PER_PAGE }}
     </p>
 

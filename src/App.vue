@@ -1,10 +1,11 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import FooterComponent from './components/FooterComponent.vue'
 </script>
 
 <template>
   <div class="min-h-screen"> <!-- Background color changed to La Liga red -->
-    <header style="padding: 12px; border-bottom: 1px solid #eee; background: white;">
+    <header style="padding: 12px; border-bottom: 1px solid #eee; background: white; margin-bottom: 16px;">
       <nav style="display: flex; align-items: center; justify-content: space-between; gap: 24px;">
         <div style="flex-shrink: 0;">
           <img src="/src/assets/Pictures/Laligalogo.png" style="width: 500px; height: auto;" alt="La Liga Logo" />
@@ -15,18 +16,32 @@ import { RouterLink, RouterView } from 'vue-router'
           <RouterLink to="/fixtures" style="font-weight: 600; white-space: nowrap; font-size: 30px;">Fixtures</RouterLink>
           <RouterLink to="/teams" style="font-weight: 600; white-space: nowrap; font-size: 30px;">Teams</RouterLink>
           <RouterLink to="/news" style="font-weight: 600; white-space: nowrap; font-size: 30px;">News</RouterLink>
-          <RouterLink to="/admin" style="font-weight: 600; white-space: nowrap; font-size: 30px;">Admin</RouterLink>
+          <RouterLink to="/admin" style="font-weight: 600; white-space: nowrap; font-size: 30px;">Login</RouterLink>
         </div>
       </nav>
     </header>
 
     <main>
       <RouterView />
+      <FooterComponent />
     </main>
+
   </div>
+
+
 </template>
 
-<style scoped>
-/* (volitelně si nech svoje styly) */
+<style>
+/* make the wrapper fill the full viewport */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* allow main content to grow */
+.main-content {
+  flex: 1;
+}
 </style>
 

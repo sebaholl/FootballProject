@@ -128,7 +128,7 @@ const filtered = computed(() => {
       </div>
     </header>
 
-    <div v-if="loading" class="muted">Načítám…</div>
+    <div v-if="loading" class="muted">Loading...</div>
     <div v-else-if="err" class="err">{{ err }}</div>
 
     <transition-group name="fade" tag="ul" class="list" v-else>
@@ -206,6 +206,8 @@ h2 { margin:0; font-weight:800; }
 .card.upcoming { background: linear-gradient(0deg,#f4f7ff 0,#fff 46%); }
 .card.done     { background: linear-gradient(0deg,#ecfdf5 0,#fff 46%); }
 
+
+
 .meta { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
 .badge { font-size:.75rem; padding:4px 8px; border-radius:999px; font-weight:800; letter-spacing:.2px; }
 .badge.league { border:1px solid #ddd6fe; background:#f5f3ff; color:#111827; }
@@ -237,6 +239,19 @@ h2 { margin:0; font-weight:800; }
 
 .muted { opacity:.75; color:#111827; }
 .err { color:#c00; font-weight:800; }
+
+/* EVEN AND ODD*/
+.list li:nth-child(even) {
+  background-color: #47739e; /* light gray (Tailwind's gray-50) */
+}
+
+.list li:nth-child(odd) {
+  background-color: #000000; /* white */
+}
+
+.list li:hover {
+  background-color: #f3f4f6; /* a bit darker on hover */
+}
 
 @media (max-width: 860px) {
   .row { grid-template-columns: 1fr; gap:10px; }

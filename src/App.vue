@@ -10,6 +10,7 @@ import FooterComponent from './components/FooterComponent.vue'
         <div style="flex-shrink: 0;">
           <img src="/src/assets/Pictures/Laligalogo.png" style="width: 500px; height: auto;" alt="La Liga Logo" />
         </div>
+      <div class="navbar">
         <div style="display: flex; align-items: center; gap: 24px;">
           <RouterLink to="/" style="font-weight: 600; white-space: nowrap; font-size: 30px;">Home</RouterLink>
           <RouterLink to="/standings" style="font-weight: 600; white-space: nowrap; font-size: 30px;">Standings</RouterLink>
@@ -18,6 +19,7 @@ import FooterComponent from './components/FooterComponent.vue'
           <RouterLink to="/news" style="font-weight: 600; white-space: nowrap; font-size: 30px;">News</RouterLink>
           <RouterLink to="/admin" style="font-weight: 600; white-space: nowrap; font-size: 30px;">Login</RouterLink>
         </div>
+      </div>
       </nav>
     </header>
 
@@ -42,6 +44,37 @@ import FooterComponent from './components/FooterComponent.vue'
 /* allow main content to grow */
 .main-content {
   flex: 1;
+}
+
+/* Navbar animation */
+.navbar a {
+  position: relative;
+  font-weight: 600;
+  white-space: nowrap;
+  font-size: 30px;
+  color: #ff0030;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+
+
+
+/* Animated underline */
+.navbar a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background-color: #ff0030;
+  transition: width 0.3s ease;
+}
+
+
+.navbar a:hover::after {
+  width: 100%;
 }
 </style>
 

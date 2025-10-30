@@ -4,7 +4,7 @@ import FooterComponent from './components/FooterComponent.vue'
 </script>
 
 <template>
-  <div class="min-h-screen"> <!-- Background color changed to La Liga red -->
+  <div>
     <header style="padding: 12px; border-bottom: 1px solid #eee; background: white; margin-bottom: 16px;">
       <nav style="display: flex; align-items: center; justify-content: space-between; gap: 24px;">
         <div style="flex-shrink: 0;">

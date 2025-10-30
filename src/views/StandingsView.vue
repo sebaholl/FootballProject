@@ -73,21 +73,21 @@ function teamLogo(id) {
   <section style="padding:24px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
     <h2>Standings</h2>
 
-    <p v-if="loading">Načítám…</p>
+    <p v-if="loading">loading…</p>
     <p v-else-if="err" style="color:#c00">{{ err }}</p>
 
     <table v-else style="width:100%; border-collapse:collapse">
       <thead>
         <tr>
-          <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd">Poz.</th>
-          <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd">Tým</th>
-          <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">Z</th>
-          <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">V</th>
-          <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">R</th>
-          <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">P</th>
+          <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd">Position</th>
+          <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd">Team</th>
+          <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">x</th>
+          <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">W</th>
+          <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">D</th>
+          <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">L</th>
           <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">GF</th>
           <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">GA</th>
-          <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">Body</th>
+          <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">Pts</th>
         </tr>
       </thead>
       <tbody>

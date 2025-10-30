@@ -19,7 +19,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <section style="padding:24px; max-width:1000px; margin:0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <section style="padding:24px; max-width:1000px; margin:30px auto; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
     <h2 style="margin-bottom:12px">News</h2>
     <p v-if="err" style="color:#c00">{{ err }}</p>
 

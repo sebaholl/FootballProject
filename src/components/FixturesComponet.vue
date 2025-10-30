@@ -150,12 +150,13 @@ function collapse() {
 
 <template>
 
-  <section class="wrap" style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <section class="wrap" style="background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
     <header class="head">
       <h2>Played Games</h2>
 
       <!-- hezčí pill-picker pro 1–7 -->
       <div class="round-picker" role="group" aria-label="Výběr kola">
+        <p>Rounds</p>
         <button class="pill" :class="{active: selectedRound === ''}" @click="selectedRound=''">All</button>
         <button v-for="n in 7" :key="n" class="pill" :class="{active: selectedRound === String(n)}" @click="selectedRound = String(n)">
           {{ n }}
@@ -163,7 +164,7 @@ function collapse() {
       </div>
     </header>
 
-    <div v-if="loading" class="muted">Načítám…</div>
+    <div v-if="loading" class="muted">Loading…</div>
     <div v-else-if="err" class="err">{{ err }}</div>
 
     <transition-group name="fade" tag="ul" class="list" v-else>
